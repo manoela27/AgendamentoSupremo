@@ -1,0 +1,165 @@
+﻿@model IEnumerable<AgendamentoApp.Entidade.Agendamento>
+@{
+    ViewData["Title"] = "Meus Agendamentos";
+}
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold text-gray-900">Meus Agendamentos</h1>
+            <div class="flex space-x-3">
+                <input type="date" id="dataFiltro"
+                       class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block sm:text-sm border-gray-300 rounded-md"
+                       value="@DateTime.Today.ToString("yyyy-MM-dd")">
+            </div>
+        </div>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            @if (Model != null && Model.Any())
+            {
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Horário
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Cliente
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Serviço
+                                </th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Status
+                                </th>
+                                <th scope="col" class="relative px-6 py-3">
+                                    <span class="sr-only">Ações</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach (var agendamento in Model.OrderBy(a => a.DataHora))
+                            {
+                                <tr class="agendamento-row" data-date="@agendamento.DataHora.ToString("yyyy-MM-dd")">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            @agendamento.DataHora.ToString("dd/MM/yyyy")
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            @agendamento.DataHora.ToString("HH:mm")
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    @agendamento.Cliente.Nome
+                                                </div>
+                                                <div class="text-sm text-gray-500">
+                                                    @agendamento.Cliente.Telefone
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">@agendamento.Servico.Nome</div>
+                                        <div class="text-sm text-gray-500">@agendamento.Servico.DuracaoMinutos min</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                              @(agendamento.Status == "Agendado" ? "bg-blue-100 text-blue-800" :
+                                                agendamento.Status == "Concluído" ? "bg-green-100 text-green-800" :
+                                                agendamento.Status == "Cancelado" ? "bg-red-100 text-red-800" :
+                                                "bg-gray-100 text-gray-800")">
+                                            @agendamento.Status
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        @if (agendamento.Status == "Agendado")
+                                        {
+                                            <form asp-action="ConcluirAgendamento" method="post" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@agendamento.Id" />
+                                                <button type="submit"
+                                                        class="text-green-600 hover:text-green-900 mr-3"
+                                                        onclick="return confirm('Confirmar conclusão do agendamento?')">
+                                                    <i class="fas fa-check"></i>
+                                                    <span class="sr-only">Concluir</span>
+                                                </button>
+                                            </form>
+                                            <form asp-action="CancelarAgendamento" method="post" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@agendamento.Id" />
+                                                <button type="submit"
+                                                        class="text-red-600 hover:text-red-900"
+                                                        onclick="return confirm('Tem certeza que deseja cancelar este agendamento?')">
+                                                    <i class="fas fa-times"></i>
+                                                    <span class="sr-only">Cancelar</span>
+                                                </button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-12">
+                    <i class="fas fa-calendar-times text-gray-400 text-5xl mb-4"></i>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum agendamento encontrado</h3>
+                    <p class="mt-1 text-sm text-gray-500">Não há agendamentos para a data selecionada.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Filtro por data
+            $('#dataFiltro').on('change', function() {
+                var selectedDate = $(this).val();
+                $('.agendamento-row').each(function() {
+                    var rowDate = $(this).data('date');
+                    if (rowDate === selectedDate) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+
+                // Mostra mensagem quando não há agendamentos
+                if ($('.agendamento-row:visible').length === 0) {
+                    if ($('.no-appointments').length === 0) {
+                        $('.min-w-full').after(`
+                            <div class="text-center py-12 no-appointments">
+                                <i class="fas fa-calendar-times text-gray-400 text-5xl mb-4"></i>
+                                <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum agendamento encontrado</h3>
+                                <p class="mt-1 text-sm text-gray-500">Não há agendamentos para a data selecionada.</p>
+                            </div>
+                        `);
+                    }
+                } else {
+                    $('.no-appointments').remove();
+                }
+            });
+
+            // Inicializa com a data atual
+            $('#dataFiltro').trigger('change');
+        });
+    </script>
+
+    @if (TempData["StatusMessage"] != null)
+    {
+        <script>
+            $(document).ready(function() {
+                toastr.success('@TempData["StatusMessage"]');
+            });
+        </script>
+    }
+}

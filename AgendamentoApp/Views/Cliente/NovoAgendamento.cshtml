@@ -1,0 +1,197 @@
+﻿@model AgendamentoApp.Entidade.Agendamento
+@{
+    ViewData["Title"] = "Novo Agendamento";
+}
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="px-4 sm:px-6">
+                <h1 class="text-2xl font-semibold text-gray-900">Novo Agendamento</h1>
+                <p class="mt-1 text-sm text-gray-600">
+                    Selecione o serviço, profissional e horário desejado.
+                </p>
+            </div>
+
+            <div class="mt-6">
+                <form method="post" class="space-y-6" id="agendamentoForm">
+                    @Html.AntiForgeryToken()
+
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label for="ServicoId" class="block text-sm font-medium text-gray-700">Serviço</label>
+                            <div class="mt-1">
+                                <select id="ServicoId" name="ServicoId" required
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                    <option value="">Selecione um serviço</option>
+                                    @foreach (var servico in ViewBag.Servicos)
+                                    {
+                                        <option value="@servico.Id" data-duracao="@servico.DuracaoMinutos" data-preco="@servico.Preco">
+                                            @servico.Nome - @servico.DuracaoMinutos min - R$ @servico.Preco.ToString("N2")
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="FuncionarioId" class="block text-sm font-medium text-gray-700">Profissional</label>
+                            <div class="mt-1">
+                                <select id="FuncionarioId" name="FuncionarioId" required
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                    <option value="">Selecione um profissional</option>
+                                    @foreach (var funcionario in ViewBag.Funcionarios)
+                                    {
+                                        <option value="@funcionario.Id">@funcionario.Nome - @funcionario.Cargo.Nome</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="Data" class="block text-sm font-medium text-gray-700">Data</label>
+                            <div class="mt-1">
+                                <input type="date" id="Data" name="Data" required min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                       class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="Horario" class="block text-sm font-medium text-gray-700">Horário</label>
+                            <div class="mt-1">
+                                <select id="Horario" name="Horario" required disabled
+                                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                    <option value="">Selecione um horário</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="Observacoes" class="block text-sm font-medium text-gray-700">Observações</label>
+                            <div class="mt-1">
+                                <textarea id="Observacoes" name="Observacoes" rows="3"
+                                          class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="resumoAgendamento" class="hidden bg-gray-50 p-4 rounded-md">
+                        <h3 class="text-lg font-medium text-gray-900">Resumo do Agendamento</h3>
+                        <dl class="mt-2 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Serviço</dt>
+                                <dd class="mt-1 text-sm text-gray-900" id="resumoServico"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Profissional</dt>
+                                <dd class="mt-1 text-sm text-gray-900" id="resumoProfissional"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Data e Hora</dt>
+                                <dd class="mt-1 text-sm text-gray-900" id="resumoDataHora"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Valor</dt>
+                                <dd class="mt-1 text-sm text-gray-900" id="resumoValor"></dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    @if (!ViewContext.ModelState.IsValid)
+                    {
+                        <div class="rounded-md bg-red-50 p-4">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">
+                                        Ocorreram erros ao processar sua solicitação:
+                                    </h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        @Html.ValidationSummary(false)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="flex justify-end space-x-3">
+                        <a href="@Url.Action("VisualizarAgendamentos")"
+                           class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cancelar
+                        </a>
+                        <button type="submit"
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Confirmar Agendamento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            function atualizarHorariosDisponiveis() {
+                const funcionarioId = $('#FuncionarioId').val();
+                const data = $('#Data').val();
+
+                if (funcionarioId && data) {
+                    $.get('@Url.Action("GetHorariosDisponiveis", "Agendamento")', {
+                        funcionarioId: funcionarioId,
+                        data: data
+                    }, function(horarios) {
+                        const select = $('#Horario');
+                        select.empty().append('<option value="">Selecione um horário</option>');
+
+                        horarios.forEach(function(horario) {
+                            const hora = new Date(horario).toLocaleTimeString('pt-BR', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            select.append(`<option value="${hora}">${hora}</option>`);
+                        });
+
+                        select.prop('disabled', false);
+                    });
+                }
+            }
+
+            function atualizarResumo() {
+                const servico = $('#ServicoId option:selected');
+                const funcionario = $('#FuncionarioId option:selected');
+                const data = $('#Data').val();
+                const hora = $('#Horario').val();
+
+                if (servico.val() && funcionario.val() && data && hora) {
+                    $('#resumoServico').text(servico.text());
+                    $('#resumoProfissional').text(funcionario.text());
+                    $('#resumoDataHora').text(`${new Date(data).toLocaleDateString('pt-BR')} às ${hora}`);
+                    $('#resumoValor').text(`R$ ${parseFloat(servico.data('preco')).toFixed(2)}`);
+                    $('#resumoAgendamento').removeClass('hidden');
+                }
+            }
+
+            $('#FuncionarioId, #Data').change(function() {
+                atualizarHorariosDisponiveis();
+            });
+
+            $('#ServicoId, #FuncionarioId, #Data, #Horario').change(function() {
+                atualizarResumo();
+            });
+
+            // Impede datas anteriores a hoje
+            const today = new Date().toISOString().split('T')[0];
+            $('#Data').attr('min', today);
+        });
+    </script>
+
+    @if (TempData["StatusMessage"] != null)
+    {
+        <script>
+            $(document).ready(function() {
+                toastr.success('@TempData["StatusMessage"]');
+            });
+        </script>
+    }
+}

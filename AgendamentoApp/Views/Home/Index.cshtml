@@ -1,0 +1,198 @@
+﻿@{
+    ViewData["Title"] = "Início";
+}
+
+<div class="bg-white">
+    <div class="relative bg-blue-600 overflow-hidden">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
+                    Sistema de Agendamentos
+                </h1>
+                <p class="mt-3 max-w-md mx-auto text-base text-blue-200 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                    Agende seus serviços de forma rápida e fácil.
+                </p>
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <div class="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+                        <div class="rounded-md shadow">
+                            <a href="@Url.Action("Register", "Auth")" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10">
+                                Cadastre-se
+                            </a>
+                        </div>
+                        <div class="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+                            <a href="@Url.Action("Login", "Auth")" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 md:py-4 md:text-lg md:px-10">
+                                Login
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                    <div class="bg-white overflow-hidden shadow rounded-lg">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                                    <i class="fas fa-users text-white text-2xl"></i>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-500 truncate">Total de Clientes</dt>
+                                        <dd class="text-3xl font-semibold text-gray-900">@ViewBag.TotalClientes</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white overflow-hidden shadow rounded-lg">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                                    <i class="fas fa-user-tie text-white text-2xl"></i>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-500 truncate">Total de Funcionários</dt>
+                                        <dd class="text-3xl font-semibold text-gray-900">@ViewBag.TotalFuncionarios</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white overflow-hidden shadow rounded-lg">
+                        <div class="p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-purple-500 rounded-md p-3">
+                                    <i class="fas fa-calendar-check text-white text-2xl"></i>
+                                </div>
+                                <div class="ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-500 truncate">Agendamentos Hoje</dt>
+                                        <dd class="text-3xl font-semibold text-gray-900">@ViewBag.AgendamentosHoje</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (User.IsInRole("Funcionario"))
+            {
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="p-5">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                                <i class="fas fa-calendar-day text-white text-2xl"></i>
+                            </div>
+                            <div class="ml-5 w-0 flex-1">
+                                <dl>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Meus Agendamentos Hoje</dt>
+                                    <dd class="text-3xl font-semibold text-gray-900">@ViewBag.MeusAgendamentosHoje</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (User.IsInRole("Cliente"))
+            {
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Meus Próximos Agendamentos</h3>
+                        @if (ViewBag.MeusProximosAgendamentos != null && ViewBag.MeusProximosAgendamentos.Count > 0)
+                        {
+                            <div class="mt-5">
+                                <div class="flow-root">
+                                    <ul class="-my-4 divide-y divide-gray-200">
+                                        @foreach (var agendamento in ViewBag.MeusProximosAgendamentos)
+                                        {
+                                            <li class="py-4">
+                                                <div class="flex items-center space-x-4">
+                                                    <div class="flex-1 min-w-0">
+                                                        <p class="text-sm font-medium text-gray-900 truncate">
+                                                            @agendamento.Servico.Nome
+                                                        </p>
+                                                        <p class="text-sm text-gray-500">
+                                                            @agendamento.DataHora.ToString("dd/MM/yyyy HH:mm")
+                                                        </p>
+                                                        <p class="text-sm text-gray-500">
+                                                            Profissional: @agendamento.Funcionario.Nome
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                            @agendamento.Status
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="mt-2 text-sm text-gray-500">Você não possui agendamentos próximos.</p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Serviços Disponíveis -->
+    <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div class="text-center">
+            <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                Nossos Serviços
+            </h2>
+            <p class="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
+                Conheça os serviços disponíveis em nossa plataforma
+            </p>
+        </div>
+
+        <div class="mt-12 grid gap-5 max-w-lg mx-auto lg:grid-cols-3 lg:max-w-none">
+            @if (ViewBag.ServicosDisponiveis != null)
+            {
+                foreach (var servico in ViewBag.ServicosDisponiveis)
+                {
+                    <div class="flex flex-col rounded-lg shadow-lg overflow-hidden">
+                        <div class="flex-1 bg-white p-6 flex flex-col justify-between">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-semibold text-gray-900">
+                                    @servico.Nome
+                                </h3>
+                                <p class="mt-3 text-base text-gray-500">
+                                    @servico.Descricao
+                                </p>
+                            </div>
+                            <div class="mt-6 flex items-center">
+                                <div class="flex-shrink-0">
+                                    <span class="text-lg font-medium text-gray-900">
+                                        R$ @servico.Preco.ToString("N2")
+                                    </span>
+                                </div>
+                                <div class="ml-3">
+                                    <span class="text-sm text-gray-500">
+                                        Duração: @servico.DuracaoMinutos min
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

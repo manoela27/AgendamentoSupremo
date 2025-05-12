@@ -1,0 +1,179 @@
+﻿@model AgendamentoApp.Entidade.Funcionario
+@{
+    ViewData["Title"] = "Alterar Dados Pessoais";
+}
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="px-4 sm:px-6">
+                <h1 class="text-2xl font-semibold text-gray-900">Alterar Dados Pessoais</h1>
+                <p class="mt-1 text-sm text-gray-600">
+                    Atualize suas informações pessoais conforme necessário.
+                </p>
+            </div>
+
+            <div class="mt-6">
+                <form method="post" class="space-y-6">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CargoId" />
+
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                        <div class="sm:col-span-2">
+                            <label for="Nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                            <div class="mt-1">
+                                <input type="text" name="Nome" id="Nome" value="@Model.Nome" required
+                                       class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="Email" class="block text-sm font-medium text-gray-700">Email</label>
+                            <div class="mt-1">
+                                <input type="email" name="Email" id="Email" value="@Model.Email" required
+                                       class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="Telefone" class="block text-sm font-medium text-gray-700">Telefone</label>
+                            <div class="mt-1">
+                                <input type="tel" name="Telefone" id="Telefone" value="@Model.Telefone" required
+                                       class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="Endereco" class="block text-sm font-medium text-gray-700">Endereço</label>
+                            <div class="mt-1">
+                                <input type="text" name="Endereco" id="Endereco" value="@Model.Endereco" required
+                                       class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="Cargo" class="block text-sm font-medium text-gray-700">Cargo</label>
+                            <div class="mt-1">
+                                <input type="text" value="@Model.Cargo?.Nome" disabled
+                                       class="bg-gray-50 shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="alterarSenha" name="alterarSenha" type="checkbox"
+                                           class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="alterarSenha" class="font-medium text-gray-700">Alterar senha</label>
+                                    <p class="text-gray-500">Marque esta opção se deseja alterar sua senha.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2 hidden" id="senhaFields">
+                            <div class="space-y-4">
+                                <div>
+                                    <label for="senhaAtual" class="block text-sm font-medium text-gray-700">Senha Atual</label>
+                                    <div class="mt-1">
+                                        <input type="password" name="senhaAtual" id="senhaAtual"
+                                               class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="novaSenha" class="block text-sm font-medium text-gray-700">Nova Senha</label>
+                                    <div class="mt-1">
+                                        <input type="password" name="novaSenha" id="novaSenha"
+                                               class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="confirmarSenha" class="block text-sm font-medium text-gray-700">Confirmar Nova Senha</label>
+                                    <div class="mt-1">
+                                        <input type="password" name="confirmarSenha" id="confirmarSenha"
+                                               class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!ViewContext.ModelState.IsValid)
+                    {
+                        <div class="rounded-md bg-red-50 p-4">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">
+                                        Ocorreram erros ao processar sua solicitação:
+                                    </h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        @Html.ValidationSummary(false)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="flex justify-end">
+                        <button type="submit"
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Máscara para telefone
+            $('#Telefone').on('input', function() {
+                let value = $(this).val().replace(/\D/g, '');
+                if (value.length > 10) {
+                    value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                } else {
+                    value = value.replace(/^(\d{2})(\d{4})(\d{4}).*/, '($1) $2-$3');
+                }
+                $(this).val(value);
+            });
+
+            // Toggle campos de senha
+            $('#alterarSenha').change(function() {
+                if ($(this).is(':checked')) {
+                    $('#senhaFields').removeClass('hidden');
+                    $('#senhaAtual, #novaSenha, #confirmarSenha').prop('required', true);
+                } else {
+                    $('#senhaFields').addClass('hidden');
+                    $('#senhaAtual, #novaSenha, #confirmarSenha').prop('required', false);
+                }
+            });
+
+            // Validação de senha
+            $('form').on('submit', function(e) {
+                if ($('#alterarSenha').is(':checked')) {
+                    if ($('#novaSenha').val() !== $('#confirmarSenha').val()) {
+                        e.preventDefault();
+                        alert('As senhas não coincidem!');
+                        return false;
+                    }
+                }
+            });
+        });
+    </script>
+
+    @if (TempData["StatusMessage"] != null)
+    {
+        <script>
+            $(document).ready(function() {
+                toastr.success('@TempData["StatusMessage"]');
+            });
+        </script>
+    }
+}

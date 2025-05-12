@@ -1,0 +1,65 @@
+﻿@model AgendamentoApp.Entidade.Usuario
+@{
+    ViewData["Title"] = "Meu Perfil";
+}
+
+<div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-8">
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">Meu Perfil</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Nome Completo</label>
+                <p class="mt-1 text-lg text-gray-800">@Model.Nome</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Email</label>
+                <p class="mt-1 text-lg text-gray-800">@Model.Email</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-600">CPF</label>
+                <p class="mt-1 text-lg text-gray-800">@Model.CPF</p>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Telefone</label>
+                <p class="mt-1 text-lg text-gray-800">@Model.Telefone</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Endereço</label>
+                <p class="mt-1 text-lg text-gray-800">@Model.Endereco</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-600">Data de Cadastro</label>
+                <p class="mt-1 text-lg text-gray-800">@Model.DataCadastro.ToString("dd/MM/yyyy")</p>
+            </div>
+        </div>
+    </div>
+
+    @if (User.IsInRole("Cliente"))
+    {
+        <div class="mt-8 flex space-x-4">
+            <a asp-controller="Cliente" asp-action="AlterarDadosPessoais"
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-edit mr-2"></i>
+                Alterar Dados
+            </a>
+        </div>
+    }
+    @if (User.IsInRole("Funcionario"))
+    {
+        <div class="mt-8 flex space-x-4">
+            <a asp-controller="Funcionario" asp-action="AlterarDadosPessoais"
+               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-edit mr-2"></i>
+                Alterar Dados
+            </a>
+        </div>
+    }
+</div>

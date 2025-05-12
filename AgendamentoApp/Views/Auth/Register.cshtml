@@ -1,0 +1,111 @@
+﻿@model AgendamentoApp.Entidade.Usuario
+@{
+    ViewData["Title"] = "Registro";
+}
+
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Criar nova conta
+            </h2>
+        </div>
+        <form class="mt-8 space-y-6" method="POST">
+            @Html.AntiForgeryToken()
+            <div class="rounded-md shadow-sm -space-y-px">
+                <div class="mb-4">
+                    <label for="nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                    <input type="text" name="Nome" id="nome" required
+                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+
+                <div class="mb-4">
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" name="Email" id="email" required
+                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    <input type="hidden" name="UserName" id="username">
+                </div>
+
+                <div class="mb-4">
+                    <label for="cpf" class="block text-sm font-medium text-gray-700">CPF</label>
+                    <input type="text" name="CPF" id="cpf" required
+                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+
+                <div class="mb-4">
+                    <label for="telefone" class="block text-sm font-medium text-gray-700">Telefone</label>
+                    <input type="tel" name="Telefone" id="telefone" required
+                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+
+                <div class="mb-4">
+                    <label for="endereco" class="block text-sm font-medium text-gray-700">Endereço</label>
+                    <input type="text" name="Endereco" id="endereco" required
+                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+
+                <div class="mb-4">
+                    <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
+                    <input type="password" name="password" id="password" required
+                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+            </div>
+
+            @if (!ViewContext.ModelState.IsValid)
+            {
+                <div class="text-red-500 text-sm mt-2">
+                    @Html.ValidationSummary(false)
+                </div>
+            }
+
+            <div>
+                <button type="submit"
+                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fas fa-user-plus"></i>
+                    </span>
+                    Registrar
+                </button>
+            </div>
+        </form>
+        <div class="text-center">
+            <p class="mt-2 text-sm text-gray-600">
+                Já tem uma conta?
+                <a href="@Url.Action("Login", "Auth")" class="font-medium text-blue-600 hover:text-blue-500">
+                    Faça login
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Sync email to username
+            $('#email').on('input', function() {
+                $('#username').val($(this).val());
+            });
+
+            // Máscara para CPF
+            $('#cpf').on('input', function() {
+                let value = $(this).val().replace(/\D/g, '');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                $(this).val(value);
+            });
+
+            // Máscara para telefone
+            $('#telefone').on('input', function() {
+                let value = $(this).val().replace(/\D/g, '');
+                if (value.length > 10) {
+                    value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+                } else {
+                    value = value.replace(/^(\d{2})(\d{4})(\d{4}).*/, '($1) $2-$3');
+                }
+                $(this).val(value);
+            });
+        });
+    </script>
+}

@@ -1,0 +1,150 @@
+﻿@model IEnumerable<AgendamentoApp.Entidade.Agendamento>
+@{
+    ViewData["Title"] = "Relatório de Faturamento Diário";
+}
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold text-gray-900">Relatório de Faturamento Diário</h1>
+            <div class="flex space-x-4">
+                <div>
+                    <label for="data" class="block text-sm font-medium text-gray-700">Data</label>
+                    <input type="date" id="data" name="data" value="@ViewBag.Data.ToString("yyyy-MM-dd")"
+                           class="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div class="flex items-end">
+                    <button type="button" id="filtrar"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        <i class="fas fa-filter mr-2"></i>
+                        Filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 mb-6">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                            <i class="fas fa-dollar-sign text-white text-2xl"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Faturamento do Dia</dt>
+                                <dd class="text-3xl font-semibold text-gray-900">R$ @ViewBag.FaturamentoDiario.ToString("N2")</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                            <i class="fas fa-calendar-check text-white text-2xl"></i>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total de Agendamentos Concluídos</dt>
+                                <dd class="text-3xl font-semibold text-gray-900">@ViewBag.TotalAgendamentos</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Agendamentos -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Detalhamento dos Agendamentos</h3>
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Horário
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Cliente
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Serviço
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Profissional
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Valor
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach (var agendamento in Model.OrderBy(a => a.DataHora))
+                                {
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            @agendamento.DataHora.ToString("HH:mm")
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">@agendamento.Cliente.Nome</div>
+                                            <div class="text-sm text-gray-500">@agendamento.Cliente.Telefone</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">@agendamento.Servico.Nome</div>
+                                            <div class="text-sm text-gray-500">@agendamento.Servico.DuracaoMinutos min</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-900">@agendamento.Funcionario.Nome</div>
+                                            <div class="text-sm text-gray-500">@agendamento.Funcionario.Cargo?.Nome</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            R$ @agendamento.Servico.Preco.ToString("N2")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot class="bg-gray-50">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">
+                                        Total:
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        R$ @ViewBag.FaturamentoDiario.ToString("N2")
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-12">
+                        <i class="fas fa-calendar-times text-gray-400 text-5xl mb-4"></i>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum agendamento encontrado</h3>
+                        <p class="mt-1 text-sm text-gray-500">Não há agendamentos concluídos para a data selecionada.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#filtrar').click(function() {
+                const data = $('#data').val();
+                if (data) {
+                    window.location.href = `@Url.Action("RelatorioFaturamentoDiario")?data=${data}`;
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,132 @@
+﻿@model IEnumerable<AgendamentoApp.Entidade.Funcionario>
+@{
+    ViewData["Title"] = "Funcionários";
+}
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold text-gray-900">Funcionários</h1>
+            <a href="@Url.Action("CadastrarFuncionario")"
+               class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                <i class="fas fa-plus mr-2"></i>
+                Novo Funcionário
+            </a>
+        </div>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+            @if (Model != null && Model.Any())
+            {
+                <ul class="divide-y divide-gray-200">
+                    @foreach (var funcionario in Model)
+                    {
+                        <li>
+                            <div class="px-4 py-4 sm:px-6">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                                <i class="fas fa-user-tie text-blue-600 text-lg"></i>
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                @funcionario.Nome
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                @funcionario.Email
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-4">
+                                        <div class="flex flex-col items-end">
+                                            <div class="text-sm text-gray-900">
+                                                @funcionario.Cargo?.Nome
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                @funcionario.Telefone
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <a href="@Url.Action("EditarFuncionario", new { id = funcionario.Id })"
+                                               class="text-blue-600 hover:text-blue-900">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            @if (funcionario.Ativo)
+                                            {
+                                                <form asp-action="DesativarFuncionario" method="post" class="inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@funcionario.Id" />
+                                                    <button type="submit" class="text-red-600 hover:text-red-900"
+                                                            onclick="return confirm('Tem certeza que deseja desativar este funcionário?')">
+                                                        <i class="fas fa-user-slash"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="AtivarFuncionario" method="post" class="inline">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@funcionario.Id" />
+                                                    <button type="submit" class="text-green-600 hover:text-green-900"
+                                                            onclick="return confirm('Tem certeza que deseja ativar este funcionário?')">
+                                                        <i class="fas fa-user-check"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-2 sm:flex sm:justify-between">
+                                    <div class="sm:flex">
+                                        <div class="flex items-center text-sm text-gray-500">
+                                            <i class="fas fa-id-card mr-1.5"></i>
+                                            @funcionario.CPF
+                                        </div>
+                                    </div>
+                                    <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                                        <i class="fas fa-calendar mr-1.5"></i>
+                                        <p>
+                                            Cadastrado em @funcionario.DataCadastro.ToString("dd/MM/yyyy")
+                                        </p>
+                                        <div class="ml-4">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full @(funcionario.Ativo ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800")">
+                                                @(funcionario.Ativo ? "Ativo" : "Inativo")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <div class="text-center py-12">
+                    <i class="fas fa-users text-gray-400 text-5xl mb-4"></i>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum funcionário cadastrado</h3>
+                    <p class="mt-1 text-sm text-gray-500">Comece cadastrando um novo funcionário.</p>
+                    <div class="mt-6">
+                        <a href="@Url.Action("CadastrarFuncionario")"
+                           class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            <i class="fas fa-plus mr-2"></i>
+                            Novo Funcionário
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (TempData["StatusMessage"] != null)
+    {
+        <script>
+            $(document).ready(function() {
+                toastr.success('@TempData["StatusMessage"]');
+            });
+        </script>
+    }
+}

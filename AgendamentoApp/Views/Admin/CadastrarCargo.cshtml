@@ -1,0 +1,94 @@
+﻿@model AgendamentoApp.Entidade.Cargo
+@{
+    ViewData["Title"] = "Cadastrar Cargo";
+}
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="px-4 sm:px-6">
+                <h1 class="text-2xl font-semibold text-gray-900">Cadastrar Novo Cargo</h1>
+            </div>
+
+            <div class="mt-6">
+                <form method="post" class="space-y-6">
+                    @Html.AntiForgeryToken()
+
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4">
+                        <div>
+                            <label for="Nome" class="block text-sm font-medium text-gray-700">Nome do Cargo</label>
+                            <div class="mt-1">
+                                <input type="text" name="Nome" id="Nome" required
+                                       class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                       placeholder="Ex: Cabeleireiro, Manicure, etc.">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="Descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+                            <div class="mt-1">
+                                <textarea id="Descricao" name="Descricao" rows="3" required
+                                          class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                          placeholder="Descreva as principais responsabilidades e atribuições do cargo"></textarea>
+                            </div>
+                            <p class="mt-2 text-sm text-gray-500">
+                                Breve descrição das responsabilidades e atribuições do cargo.
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (!ViewContext.ModelState.IsValid)
+                    {
+                        <div class="rounded-md bg-red-50 p-4">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">
+                                        Ocorreram erros ao processar sua solicitação:
+                                    </h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        @Html.ValidationSummary(false)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="flex justify-end space-x-3">
+                        <a href="@Url.Action("ListarCargos")"
+                           class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cancelar
+                        </a>
+                        <button type="submit"
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cadastrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#Descricao').on('input', function() {
+                var maxLength = 500;
+                var currentLength = $(this).val().length;
+                var remainingChars = maxLength - currentLength;
+
+                if (!$('#char-count').length) {
+                    $(this).after('<div id="char-count" class="mt-1 text-sm text-gray-500"></div>');
+                }
+
+                $('#char-count').text(`${remainingChars} caracteres restantes`);
+
+                if (remainingChars < 0) {
+                    $('#char-count').removeClass('text-gray-500').addClass('text-red-500');
+                } else {
+                    $('#char-count').removeClass('text-red-500').addClass('text-gray-500');
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,133 @@
+﻿@using AgendamentoApp.Models
+@model IEnumerable<AgendamentoApp.Entidade.Funcionario>
+@{
+    ViewData["Title"] = "Relatório de Desempenho dos Funcionários";
+    var desempenhoList = (List<FuncionarioDesempenhoDTO>)ViewBag.Desempenho;
+}
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-semibold text-gray-900">Relatório de Desempenho dos Funcionários</h1>
+            <div class="flex space-x-4">
+                <div>
+                    <label for="dataInicio" class="block text-sm font-medium text-gray-700">Data Início</label>
+                    <input type="date" id="dataInicio" name="dataInicio" value="@ViewBag.DataInicio.ToString("yyyy-MM-dd")"
+                           class="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label for="dataFim" class="block text-sm font-medium text-gray-700">Data Fim</label>
+                    <input type="date" id="dataFim" name="dataFim" value="@ViewBag.DataFim.ToString("yyyy-MM-dd")"
+                           class="mt-1 shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div class="flex items-end">
+                    <button type="button" id="filtrar"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                        <i class="fas fa-filter mr-2"></i>
+                        Filtrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            @if (Model != null && Model.Any())
+            {
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 p-6">
+                    @foreach (var funcionario in Model)
+                    {
+                        FuncionarioDesempenhoDTO dto = null;
+                        if (desempenhoList != null)
+                        {
+                            for (int i = 0; i < desempenhoList.Count; i++)
+                            {
+                                if (desempenhoList[i].Funcionario.Id == funcionario.Id)
+                                {
+                                    dto = desempenhoList[i];
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (dto != null)
+                        {
+                            <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+                                <div class="px-4 py-5 sm:p-6">
+                                    <div class="flex items-center mb-4">
+                                        <div class="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                                            <i class="fas fa-user-tie text-blue-600 text-xl"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h3 class="text-lg font-medium text-gray-900">@funcionario.Nome</h3>
+                                            <p class="text-sm text-gray-500">@funcionario.Cargo?.Nome</p>
+                                        </div>
+                                    </div>
+
+                                    <dl class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                        <div class="sm:col-span-1">
+                                            <dt class="text-sm font-medium text-gray-500">Total de Agendamentos</dt>
+                                            <dd class="mt-1 text-lg font-semibold text-gray-900">@dto.TotalAgendamentos</dd>
+                                        </div>
+                                        <div class="sm:col-span-1">
+                                            <dt class="text-sm font-medium text-gray-500">Agendamentos Concluídos</dt>
+                                            <dd class="mt-1 text-lg font-semibold text-gray-900">@dto.AgendamentosConcluidos</dd>
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <dt class="text-sm font-medium text-gray-500">Faturamento</dt>
+                                            <dd class="mt-1 text-lg font-semibold text-gray-900">R$ @dto.Faturamento.ToString("N2")</dd>
+                                        </div>
+                                        <div class="sm:col-span-2">
+                                            <dt class="text-sm font-medium text-gray-500">Taxa de Conclusão</dt>
+                                            <dd class="mt-1">
+                                                @{
+                                                    double taxaConclusao = 0;
+                                                    if (dto.TotalAgendamentos > 0)
+                                                    {
+                                                        taxaConclusao = (dto.AgendamentosConcluidos * 100.0) / dto.TotalAgendamentos;
+                                                    }
+                                                }
+                                                <div class="relative pt-1">
+                                                    <div class="overflow-hidden h-2 mb-1 text-xs flex rounded bg-blue-200">
+                                                        <div style="width:@taxaConclusao%"
+                                                             class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500">
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-sm font-semibold text-gray-900">
+                                                        @taxaConclusao.ToString("N1")%
+                                                    </div>
+                                                </div>
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-12">
+                    <i class="fas fa-users text-gray-400 text-5xl mb-4"></i>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">Nenhum dado encontrado</h3>
+                    <p class="mt-1 text-sm text-gray-500">Não há dados de desempenho para o período selecionado.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#filtrar').click(function() {
+                const dataInicio = $('#dataInicio').val();
+                const dataFim = $('#dataFim').val();
+
+                if (dataInicio && dataFim) {
+                    window.location.href = `@Url.Action("RelatorioDesempenhoFuncionarios")?dataInicio=${dataInicio}&dataFim=${dataFim}`;
+                }
+            });
+        });
+    </script>
+}

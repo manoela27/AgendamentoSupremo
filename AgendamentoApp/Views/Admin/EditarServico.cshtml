@@ -1,0 +1,123 @@
+﻿@model AgendamentoApp.Entidade.Servico
+@{
+    ViewData["Title"] = "Editar Serviço";
+}
+
+<div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="px-4 sm:px-6 mb-6">
+                <h1 class="text-2xl font-semibold text-gray-900">Editar Serviço</h1>
+                <p class="mt-1 text-sm text-gray-600">
+                    Atualize as informações do serviço conforme necessário.
+                </p>
+            </div>
+
+            <form method="post" class="space-y-6">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                    <div class="sm:col-span-2">
+                        <label for="Nome" class="block text-sm font-medium text-gray-700">Nome do Serviço</label>
+                        <div class="mt-1">
+                            <input type="text" name="Nome" id="Nome" value="@Model.Nome" required
+                                   class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label for="Descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+                        <div class="mt-1">
+                            <textarea id="Descricao" name="Descricao" rows="3" required
+                                      class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">@Model.Descricao</textarea>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="Preco" class="block text-sm font-medium text-gray-700">Preço (R$)</label>
+                        <div class="mt-1 relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 sm:text-sm">R$</span>
+                            </div>
+                            <input type="number" name="Preco" id="Preco" required step="0.01" min="0" value="@Model.Preco"
+                                   class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-12 sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="DuracaoMinutos" class="block text-sm font-medium text-gray-700">Duração (minutos)</label>
+                        <div class="mt-1">
+                            <input type="number" name="DuracaoMinutos" id="DuracaoMinutos" required min="1" value="@Model.DuracaoMinutos"
+                                   class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input type="hidden" name="Ativo" value="false" />
+                                <input id="Ativo" name="Ativo" type="checkbox" value="true" @(Model.Ativo ? "checked" : "")
+                                       class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="Ativo" class="font-medium text-gray-700">Ativo</label>
+                                <p class="text-gray-500">Serviço ativo pode ser agendado pelos clientes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!ViewContext.ModelState.IsValid)
+                {
+                    <div class="rounded-md bg-red-50 p-4">
+                        <div class="flex">
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">
+                                    Ocorreram erros ao processar sua solicitação:
+                                </h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    @Html.ValidationSummary(false)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="flex justify-end space-x-3">
+                    <a href="@Url.Action("ListarServicos")"
+                       class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Cancelar
+                    </a>
+                    <button type="submit"
+                            class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Formata o campo de preço para mostrar duas casas decimais
+            $('#Preco').on('change', function() {
+                $(this).val(parseFloat($(this).val()).toFixed(2));
+            });
+
+            // Inicializa com o valor formatado
+            $('#Preco').trigger('change');
+        });
+    </script>
+
+    @if (TempData["StatusMessage"] != null)
+    {
+        <script>
+            $(document).ready(function() {
+                toastr.success('@TempData["StatusMessage"]');
+            });
+        </script>
+    }
+}
