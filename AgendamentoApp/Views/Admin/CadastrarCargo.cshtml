@@ -35,6 +35,41 @@
                                 Breve descrição das responsabilidades e atribuições do cargo.
                             </p>
                         </div>
+
+                        <div>
+                            <div class="mt-1">
+                                <div>
+                                    <label for="FuncionariosDropdown" class="block text-sm font-medium text-gray-700">Funcionários</label>
+                                    <div class="relative mt-1">
+                                        <button type="button" id="FuncionariosDropdown" class="w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-pointer sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                            <span id="selectedCount">Nenhum selecionado</span>
+                                            <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                                <i class="fas fa-chevron-down text-gray-500"></i>
+                                            </span>
+                                        </button>
+
+                                        <div id="optionsContainer" class="absolute mt-1 w-full rounded-md bg-white shadow-lg border border-gray-300 z-10 hidden max-h-60 overflow-auto">
+                                            @foreach (var funcionario in ViewBag.Funcionarios as List<SelectListItem>)
+                                            {
+                                                <label class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                                                    <input type="checkbox" class="funcionario-checkbox mr-2" value="@funcionario.Value">
+                                                    @funcionario.Text
+                                                </label>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    
+                                    <div id="hiddenInputs"></div>
+
+                                    <p class="mt-2 text-sm text-gray-500">
+                                        Selecione os funcionários relacionados a este cargo.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
                     </div>
 
                     @if (!ViewContext.ModelState.IsValid)
@@ -71,8 +106,8 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
-            $('#Descricao').on('input', function() {
+        $(document).ready(function () {
+            $('#Descricao').on('input', function () {
                 var maxLength = 500;
                 var currentLength = $(this).val().length;
                 var remainingChars = maxLength - currentLength;
@@ -89,6 +124,39 @@
                     $('#char-count').removeClass('text-red-500').addClass('text-gray-500');
                 }
             });
+
+        });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            const dropdownBtn = $("#FuncionariosDropdown");
+            const optionsContainer = $("#optionsContainer");
+            const selectedCount = $("#selectedCount");
+            const hiddenInputs = $("#hiddenInputs");
+
+            dropdownBtn.on("click", function () { 
+                optionsContainer.toggleClass("hidden");
+            });
+
+            $(document).on("change", ".funcionario-checkbox", function () {
+                const selected = $(".funcionario-checkbox:checked");
+                const count = selected.length;
+
+                selectedCount.text(count > 0 ? `${count} selecionado${count > 1 ? 's' : ''}` : "Nenhum selecionado");
+
+                hiddenInputs.empty();
+                selected.each(function () {
+                    hiddenInputs.append(`<input type="hidden" name="FuncionariosIds" value="${$(this).val()}" />`);
+                });
+            });
+
+            $(document).on("click", function (e) {
+                if (!$(e.target).closest("#FuncionariosDropdown, #optionsContainer").length) {
+                    optionsContainer.addClass("hidden");
+                }
+            });
         });
     </script>
+
 }

@@ -1,9 +1,9 @@
 ﻿using AgendamentoApp.Entidade;
+using AgendamentoApp.Infraestrutura;
 using AgendamentoApp.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using AgendamentoApp.Infraestrutura;
 using Microsoft.EntityFrameworkCore;
 
 namespace AgendamentoApp.Controllers;
@@ -158,9 +158,57 @@ public class AgendamentoController : Controller
     }
 
     [HttpGet]
-    public async Task<JsonResult> GetHorariosDisponiveis(string funcionarioId, DateTime data)
+    public async Task<JsonResult> GetHorariosDisponiveis(string funcionarioId, DateTime data, int servicoId)
     {
-        var horarios = await _funcionarioService.GetHorariosDisponiveisAsync(funcionarioId, data);
+        // Buscar a duração do serviço
+        var servico = await _context.Servicos.FindAsync(servicoId);
+        if (servico == null)
+        {
+            return Json(new List<DateTime>());
+        }
+
+        // Buscar todos os agendamentos do funcionário para o dia
+        var agendamentosDoFuncionario = await _context.Agendamentos
+            .Include(a => a.Servico)
+            .Where(a => a.FuncionarioId == funcionarioId &&
+                       a.DataHora.Date == data.Date &&
+                       a.Status != "Cancelado")
+            .OrderBy(a => a.DataHora)
+            .ToListAsync();
+
+        var horarios = new List<DateTime>();
+        var horaInicio = new DateTime(data.Year, data.Month, data.Day, 8, 0, 0);
+        var horaFim = new DateTime(data.Year, data.Month, data.Day, 18, 0, 0);
+
+        var currentTime = horaInicio;
+        while (currentTime.AddMinutes(servico.DuracaoMinutos) <= horaFim)
+        {
+            if (currentTime > DateTime.Now)
+            {
+                var horarioOcupado = false;
+                var fimNovoAgendamento = currentTime.AddMinutes(servico.DuracaoMinutos);
+
+                foreach (var agendamento in agendamentosDoFuncionario)
+                {
+                    var inicioAgendamentoExistente = agendamento.DataHora;
+                    var fimAgendamentoExistente = agendamento.DataHora.AddMinutes(agendamento.Servico.DuracaoMinutos);
+
+                    // Verifica se há sobreposição entre o novo agendamento e os existentes
+                    if (!(fimNovoAgendamento <= inicioAgendamentoExistente || currentTime >= fimAgendamentoExistente))
+                    {
+                        horarioOcupado = true;
+                        break;
+                    }
+                }
+
+                if (!horarioOcupado)
+                {
+                    horarios.Add(currentTime);
+                }
+            }
+            currentTime = currentTime.AddMinutes(30);
+        }
+
         return Json(horarios);
     }
 }

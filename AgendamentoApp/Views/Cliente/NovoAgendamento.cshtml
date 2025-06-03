@@ -1,4 +1,4 @@
-﻿@model AgendamentoApp.Entidade.Agendamento
+﻿@model AgendamentoApp.Models.AgendamentoViewModel
 @{
     ViewData["Title"] = "Novo Agendamento";
 }
@@ -19,9 +19,9 @@
 
                     <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                         <div class="sm:col-span-2">
-                            <label for="ServicoId" class="block text-sm font-medium text-gray-700">Serviço</label>
+                            <label asp-for="ServicoId" class="block text-sm font-medium text-gray-700">Serviço</label>
                             <div class="mt-1">
-                                <select id="ServicoId" name="ServicoId" required
+                                <select asp-for="ServicoId" required
                                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
                                     <option value="">Selecione um serviço</option>
                                     @foreach (var servico in ViewBag.Servicos)
@@ -31,46 +31,47 @@
                                         </option>
                                     }
                                 </select>
+                                <span asp-validation-for="ServicoId" class="text-red-500 text-sm"></span>
                             </div>
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label for="FuncionarioId" class="block text-sm font-medium text-gray-700">Profissional</label>
+                            <label asp-for="FuncionarioId" class="block text-sm font-medium text-gray-700">Profissional</label>
                             <div class="mt-1">
-                                <select id="FuncionarioId" name="FuncionarioId" required
+                                <select asp-for="FuncionarioId" required disabled
                                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
                                     <option value="">Selecione um profissional</option>
-                                    @foreach (var funcionario in ViewBag.Funcionarios)
-                                    {
-                                        <option value="@funcionario.Id">@funcionario.Nome - @funcionario.Cargo.Nome</option>
-                                    }
                                 </select>
+                                <span asp-validation-for="FuncionarioId" class="text-red-500 text-sm"></span>
                             </div>
                         </div>
 
                         <div>
-                            <label for="Data" class="block text-sm font-medium text-gray-700">Data</label>
+                            <label asp-for="Data" class="block text-sm font-medium text-gray-700">Data</label>
                             <div class="mt-1">
-                                <input type="date" id="Data" name="Data" required min="@DateTime.Today.ToString("yyyy-MM-dd")"
+                                <input asp-for="Data" type="date" required min="@DateTime.Today.ToString("yyyy-MM-dd")"
                                        class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
+                                <span asp-validation-for="Data" class="text-red-500 text-sm"></span>
                             </div>
                         </div>
 
                         <div>
-                            <label for="Horario" class="block text-sm font-medium text-gray-700">Horário</label>
+                            <label asp-for="Horario" class="block text-sm font-medium text-gray-700">Horário</label>
                             <div class="mt-1">
-                                <select id="Horario" name="Horario" required disabled
+                                <select asp-for="Horario" required disabled
                                         class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
                                     <option value="">Selecione um horário</option>
                                 </select>
+                                <span asp-validation-for="Horario" class="text-red-500 text-sm"></span>
                             </div>
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label for="Observacoes" class="block text-sm font-medium text-gray-700">Observações</label>
+                            <label asp-for="Observacoes" class="block text-sm font-medium text-gray-700">Observações</label>
                             <div class="mt-1">
-                                <textarea id="Observacoes" name="Observacoes" rows="3"
+                                <textarea asp-for="Observacoes" rows="3" required
                                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md"></textarea>
+                                <span asp-validation-for="Observacoes" class="text-red-500 text-sm"></span>
                             </div>
                         </div>
                     </div>
@@ -131,31 +132,35 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             function atualizarHorariosDisponiveis() {
-                const funcionarioId = $('#FuncionarioId').val();
-                const data = $('#Data').val();
+            const funcionarioId = $('#FuncionarioId').val();
+            const data = $('#Data').val();
+            const servicoId = $('#ServicoId').val();
+            const horarioSelecionado = $('#Horario').val(); 
 
-                if (funcionarioId && data) {
-                    $.get('@Url.Action("GetHorariosDisponiveis", "Agendamento")', {
-                        funcionarioId: funcionarioId,
-                        data: data
-                    }, function(horarios) {
-                        const select = $('#Horario');
-                        select.empty().append('<option value="">Selecione um horário</option>');
+            const select = $('#Horario');
+            select.empty().append('<option value="">Selecione um horário</option>');
 
-                        horarios.forEach(function(horario) {
-                            const hora = new Date(horario).toLocaleTimeString('pt-BR', {
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            });
-                            select.append(`<option value="${hora}">${hora}</option>`);
-                        });
-
-                        select.prop('disabled', false);
+            if (funcionarioId && data && servicoId) {
+                $.get('@Url.Action("GetHorariosDisponiveis", "Agendamento")', {
+                    funcionarioId: funcionarioId,
+                    data: data,
+                    servicoId: servicoId
+                }, function (horarios) {
+                    horarios.forEach(function (horario) {
+                        const hora = horario.length === 5 ? horario : new Date(horario).toISOString().substring(11, 16);
+                        const isSelected = hora === horarioSelecionado ? 'selected' : '';
+                        select.append(`<option value="${hora}" ${isSelected}>${hora}</option>`);
                     });
-                }
+
+                    select.prop('disabled', false);
+                });
+            } else {
+                select.prop('disabled', true);
             }
+        }
+
 
             function atualizarResumo() {
                 const servico = $('#ServicoId option:selected');
@@ -172,24 +177,40 @@
                 }
             }
 
-            $('#FuncionarioId, #Data').change(function() {
-                atualizarHorariosDisponiveis();
+            $('#ServicoId').change(function () {
+                const servicoId = $(this).val();
+
+                $('#FuncionarioId').empty().append('<option value="">Carregando profissionais...</option>').prop('disabled', true);
+                $('#Horario').empty().append('<option value="">Selecione um horário</option>').prop('disabled', true);
+
+                if (servicoId) {
+                    $.get('@Url.Action("GetFuncionariosPorServico", "Cliente")', { servicoId }, function (data) {
+                        const select = $('#FuncionarioId');
+                        select.empty().append('<option value="">Selecione um profissional</option>');
+
+                        data.forEach(function (funcionario) {
+                            select.append(`<option value="${funcionario.id}">${funcionario.nome}</option>`);
+                        });
+
+                        select.prop('disabled', false);
+                    });
+                }
             });
 
-            $('#ServicoId, #FuncionarioId, #Data, #Horario').change(function() {
+            $('#FuncionarioId, #Data, #Horario, #ServicoId').change(function () {
+                atualizarHorariosDisponiveis();
                 atualizarResumo();
             });
 
-            // Impede datas anteriores a hoje
             const today = new Date().toISOString().split('T')[0];
             $('#Data').attr('min', today);
         });
     </script>
 
-    @if (TempData["StatusMessage"] != null)
+    @if (TempData["StatusMessage"] != null) 
     {
         <script>
-            $(document).ready(function() {
+            $(document).ready(function () {
                 toastr.success('@TempData["StatusMessage"]');
             });
         </script>

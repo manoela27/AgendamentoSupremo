@@ -95,6 +95,14 @@
                                                             </button>
                                                         </form>
                                                     }
+                                                    <form asp-action="ExcluirServico" method="post" class="inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="id" value="@servico.Id" />
+                                                        <button type="submit" class="text-gray-600 hover:text-gray-900"
+                                                                onclick="return confirm('Tem certeza que deseja excluir este serviço permanentemente?')">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>

@@ -1,4 +1,5 @@
 ﻿using AgendamentoApp.Entidade;
+using AgendamentoApp.Infraestrutura;
 using AgendamentoApp.Interface;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,7 +52,8 @@ public class FuncionarioService : IFuncionarioService
     {
         var agendamentosNoHorario = await _context.Agendamentos
             .Include(a => a.Servico)
-            .Where(a => a.FuncionarioId == funcionarioId)
+            .Where(a => a.FuncionarioId == funcionarioId &&
+                       a.Status != "Cancelado")
             .Where(a => a.DataHora <= dataHora &&
                        a.DataHora.AddMinutes(a.Servico.DuracaoMinutos) > dataHora)
             .AnyAsync();
@@ -65,12 +67,36 @@ public class FuncionarioService : IFuncionarioService
         var horaInicio = new DateTime(data.Year, data.Month, data.Day, 8, 0, 0);
         var horaFim = new DateTime(data.Year, data.Month, data.Day, 18, 0, 0);
 
+        // Buscar todos os agendamentos do funcionário para o dia
+        var agendamentosDoFuncionario = await _context.Agendamentos
+            .Include(a => a.Servico)
+            .Where(a => a.FuncionarioId == funcionarioId &&
+                       a.DataHora.Date == data.Date &&
+                       a.Status != "Cancelado")
+            .OrderBy(a => a.DataHora)
+            .ToListAsync();
+
         var currentTime = horaInicio;
         while (currentTime < horaFim)
         {
-            if (await IsFuncionarioDisponivelAsync(funcionarioId, currentTime))
+            // Não mostrar horários passados
+            if (currentTime > DateTime.Now)
             {
-                horarios.Add(currentTime);
+                var horarioOcupado = false;
+                foreach (var agendamento in agendamentosDoFuncionario)
+                {
+                    var fimAgendamento = agendamento.DataHora.AddMinutes(agendamento.Servico.DuracaoMinutos);
+                    if (currentTime >= agendamento.DataHora && currentTime < fimAgendamento)
+                    {
+                        horarioOcupado = true;
+                        break;
+                    }
+                }
+
+                if (!horarioOcupado)
+                {
+                    horarios.Add(currentTime);
+                }
             }
             currentTime = currentTime.AddMinutes(30);
         }

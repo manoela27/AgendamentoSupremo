@@ -1,4 +1,5 @@
 ﻿@model AgendamentoApp.Entidade.Usuario
+
 @{
     ViewData["Title"] = "Meu Perfil";
 }
@@ -22,6 +23,14 @@
                 <label class="block text-sm font-medium text-gray-600">CPF</label>
                 <p class="mt-1 text-lg text-gray-800">@Model.CPF</p>
             </div>
+            @if (User.IsInRole("Funcionario"))
+            {
+                var funcionario = Model as AgendamentoApp.Entidade.Funcionario;
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Cargo</label>
+                    <p class="mt-1 text-lg text-gray-800">@(funcionario?.Cargo?.Nome ?? "Não atribuído")</p>
+                </div>
+            }
         </div>
 
         <div class="space-y-4">
@@ -39,6 +48,8 @@
                 <label class="block text-sm font-medium text-gray-600">Data de Cadastro</label>
                 <p class="mt-1 text-lg text-gray-800">@Model.DataCadastro.ToString("dd/MM/yyyy")</p>
             </div>
+
+           
         </div>
     </div>
 
@@ -46,20 +57,37 @@
     {
         <div class="mt-8 flex space-x-4">
             <a asp-controller="Cliente" asp-action="AlterarDadosPessoais"
-               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+               class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                 <i class="fas fa-edit mr-2"></i>
                 Alterar Dados
             </a>
+
+            <form asp-controller="Cliente" asp-action="ExcluirConta" method="post" onsubmit="return confirm('Tem certeza que deseja excluir sua conta?');">
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    Excluir Conta
+                </button>
+            </form>
         </div>
     }
+
     @if (User.IsInRole("Funcionario"))
     {
         <div class="mt-8 flex space-x-4">
             <a asp-controller="Funcionario" asp-action="AlterarDadosPessoais"
-               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+               class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
                 <i class="fas fa-edit mr-2"></i>
                 Alterar Dados
             </a>
+
+            <form asp-controller="Funcionario" asp-action="ExcluirConta" method="post" onsubmit="return confirm('Tem certeza que deseja excluir sua conta?');">
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    Excluir Conta
+                </button>
+            </form>
         </div>
     }
 </div>

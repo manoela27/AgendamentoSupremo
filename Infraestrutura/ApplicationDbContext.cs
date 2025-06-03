@@ -46,5 +46,17 @@ public class ApplicationDbContext : IdentityDbContext<Usuario>
             .WithMany(c => c.Funcionarios)
             .HasForeignKey(f => f.CargoId)
             .OnDelete(DeleteBehavior.Restrict);
+
+     
+        builder.Entity<Servico>()
+            .Property(s => s.Preco)
+            .HasPrecision(10, 2);
+
+        builder.Entity<Servico>()
+            .HasOne(s => s.Cargo)
+            .WithMany()
+            .HasForeignKey(s => s.CargoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
+
 }

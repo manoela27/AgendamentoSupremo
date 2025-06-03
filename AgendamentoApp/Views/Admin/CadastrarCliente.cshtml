@@ -1,66 +1,55 @@
-﻿@model AgendamentoApp.Entidade.Cliente
-@{
-    ViewData["Title"] = "Editar Cliente";
+﻿@{
+    ViewData["Title"] = "Cadastrar Cliente";
 }
 
 <div class="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="bg-white shadow rounded-lg p-6">
-        <h1 class="text-2xl font-semibold text-gray-900 mb-6">Editar Cliente</h1>
+        <h1 class="text-2xl font-semibold text-gray-900 mb-6">Cadastrar Novo Cliente</h1>
 
         <form method="post" class="space-y-6">
             @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="Id" />
 
             <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                <div class="sm:col-span-2">
-                    <label for="Nome" class="block text-sm font-medium text-gray-700">Nome</label>
-                    <input type="text" id="Nome" name="Nome" value="@Model.Nome" required
+                <div>
+                    <label for="nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                    <input type="text" name="nome" id="nome" required
                            class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" />
                 </div>
 
                 <div>
-                    <label for="Email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" id="Email" name="Email" value="@Model.Email" required
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" name="email" id="email" required
                            class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" />
                 </div>
 
                 <div>
-                    <label for="CPF" class="block text-sm font-medium text-gray-700">CPF</label>
-                    <input type="text" id="CPF" name="CPF" value="@Model.CPF" readonly
-                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 bg-gray-100 rounded-md" />
+                    <label for="cpf" class="block text-sm font-medium text-gray-700">CPF</label>
+                    <input type="text" name="cpf" id="cpf" required
+                           class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" />
                 </div>
 
                 <div>
-                    <label for="Telefone" class="block text-sm font-medium text-gray-700">Telefone</label>
-                    <input type="tel" id="Telefone" name="Telefone" value="@Model.Telefone" required
+                    <label for="telefone" class="block text-sm font-medium text-gray-700">Telefone</label>
+                    <input type="tel" name="telefone" id="telefone" required
                            class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" />
                 </div>
 
                 <div class="sm:col-span-2">
-                    <label for="Endereco" class="block text-sm font-medium text-gray-700">Endereço</label>
-                    <input type="text" id="Endereco" name="Endereco" value="@Model.Endereco" required
+                    <label for="endereco" class="block text-sm font-medium text-gray-700">Endereço</label>
+                    <input type="text" name="endereco" id="endereco" required
                            class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" />
                 </div>
 
                 <div class="sm:col-span-2">
-                    <label for="NovaSenha" class="block text-sm font-medium text-gray-700">Nova Senha</label>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
                     <div class="mt-1 relative">
-                        <input type="password" name="NovaSenha" id="NovaSenha"
+                        <input type="password" name="password" id="password"
                                class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md pr-10" />
                         <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="toggleSenha()">
                             <i id="iconSenha" class="fas fa-eye text-gray-500"></i>
                         </div>
                     </div>
-                    <p class="mt-1 text-sm text-gray-500">Preencha este campo apenas se desejar alterar a senha.</p>
-                </div>
-
-                <div class="sm:col-span-2">
-                    <div class="flex items-start">
-                        <input type="hidden" name="Ativo" value="false" />
-                        <input id="Ativo" name="Ativo" type="checkbox" value="true" @(Model.Ativo ? "checked" : "")
-                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                        <label for="Ativo" class="ml-2 block text-sm text-gray-700">Cliente Ativo</label>
-                    </div>
+                    <p class="mt-1 text-sm text-gray-500">A senha deve ter pelo menos 6 caracteres.</p>
                 </div>
             </div>
 
@@ -85,7 +74,7 @@
                 </a>
                 <button type="submit"
                         class="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                    Salvar Alterações
+                    Cadastrar
                 </button>
             </div>
         </form>
@@ -95,7 +84,7 @@
 @section Scripts {
     <script>
         function toggleSenha() {
-            const input = document.getElementById("NovaSenha");
+            const input = document.getElementById("password");
             const icon = document.getElementById("iconSenha");
 
             if (input.type === "password") {
@@ -109,7 +98,8 @@
             }
         }
 
-        $('#CPF').on('input', function () {
+        // Máscara CPF
+        $('#cpf').on('input', function () {
             let value = $(this).val().replace(/\D/g, '');
             value = value.replace(/(\d{3})(\d)/, '$1.$2');
             value = value.replace(/(\d{3})(\d)/, '$1.$2');
@@ -117,7 +107,8 @@
             $(this).val(value);
         });
 
-        $('#Telefone').on('input', function () {
+        // Máscara telefone
+        $('#telefone').on('input', function () {
             let value = $(this).val().replace(/\D/g, '');
             if (value.length > 10) {
                 value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');

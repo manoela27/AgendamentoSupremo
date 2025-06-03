@@ -1,6 +1,7 @@
 ﻿@model AgendamentoApp.Entidade.Cargo
 @{
     ViewData["Title"] = "Editar Cargo";
+    var funcionarios = ViewBag.Funcionarios as List<SelectListItem>;
 }
 
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -39,6 +40,31 @@
                                 Breve descrição das responsabilidades e atribuições do cargo.
                             </p>
                         </div>
+
+                        <div>
+                            <label for="FuncionariosDropdown" class="block text-sm font-medium text-gray-700">Funcionários</label>
+                            <div class="relative mt-1">
+                                <button type="button" id="FuncionariosDropdown" class="w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-pointer sm:text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                                    <span id="selectedCount">Nenhum selecionado</span>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                        <i class="fas fa-chevron-down text-gray-500"></i>
+                                    </span>
+                                </button>
+
+                                <div id="optionsContainer" class="absolute mt-1 w-full rounded-md bg-white shadow-lg border border-gray-300 z-10 hidden max-h-60 overflow-auto">
+                                    @foreach (var funcionario in funcionarios)
+                                    {
+                                        var selected = Model.Funcionarios?.Any(f => f.Id == funcionario.Value) == true ? "checked" : "";
+                                        <label class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer">
+                                            <input type="checkbox" class="funcionario-checkbox mr-2" value="@funcionario.Value" @selected />
+                                            @funcionario.Text
+                                        </label>
+                                    }
+                                </div>
+                            </div>
+                            <button type="button" id="deselecionarTodos" class="mt-2 text-sm text-blue-600 hover:underline">Desvincular todos</button>
+                            <div id="hiddenInputs"></div>
+                        </div>
                     </div>
 
                     @if (!ViewContext.ModelState.IsValid)
@@ -75,33 +101,38 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
-            $('#Descricao').on('input', function() {
-                var maxLength = 500;
-                var currentLength = $(this).val().length;
-                var remainingChars = maxLength - currentLength;
+        $(document).ready(function () {
+            const dropdownBtn = $("#FuncionariosDropdown");
+            const optionsContainer = $("#optionsContainer");
+            const selectedCount = $("#selectedCount");
+            const hiddenInputs = $("#hiddenInputs");
 
-                if (!$('#char-count').length) {
-                    $(this).after('<div id="char-count" class="mt-1 text-sm text-gray-500"></div>');
-                }
+            dropdownBtn.on("click", function () {
+                optionsContainer.toggleClass("hidden");
+            });
 
-                $('#char-count').text(`${remainingChars} caracteres restantes`);
+            $(document).on("change", ".funcionario-checkbox", function () {
+                updateSelected();
+            });
 
-                if (remainingChars < 0) {
-                    $('#char-count').removeClass('text-gray-500').addClass('text-red-500');
-                } else {
-                    $('#char-count').removeClass('text-red-500').addClass('text-gray-500');
-                }
+            function updateSelected() {
+                const selected = $(".funcionario-checkbox:checked");
+                const count = selected.length;
+                selectedCount.text(count > 0 ? `${count} selecionado${count > 1 ? 's' : ''}` : "Nenhum selecionado");
+                hiddenInputs.empty();
+                selected.each(function () {
+                    hiddenInputs.append(`<input type="hidden" name="FuncionariosIds" value="${$(this).val()}" />`);
+                });
+            }
+
+            // Inicializa o contador ao carregar a página
+            updateSelected();
+
+            // Deselecionar todos os checkboxes
+            $("#deselecionarTodos").click(function () {
+                $(".funcionario-checkbox").prop("checked", false);
+                updateSelected();
             });
         });
     </script>
-
-    @if (TempData["StatusMessage"] != null)
-    {
-        <script>
-            $(document).ready(function() {
-                toastr.success('@TempData["StatusMessage"]');
-            });
-        </script>
-    }
 }

@@ -2,6 +2,29 @@
 @using AgendamentoApp.Entidade
 @inject UserManager<Usuario> UserManager
 
+@{
+    var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+    var usuario = await UserManager.GetUserAsync(User);
+}
+
+@functions {
+    public bool IsControllerActive(string controller)
+    {
+        var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+        return string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public bool IsMenuActive(string controller, params string[] actions)
+    {
+        var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["Action"]?.ToString();
+
+        return string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) &&
+               (actions.Length == 0 || actions.Contains(currentAction, StringComparer.OrdinalIgnoreCase));
+    }
+}
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -12,74 +35,98 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="bg-gray-50">
-    <header class="bg-blue-600 text-white shadow-lg">
-        <nav class="container mx-auto px-4 py-4">
-            <div class="flex justify-between items-center">
-                <a class="text-2xl font-bold" asp-controller="Home" asp-action="Index">AgendamentoApp</a>
-                <div class="flex items-center space-x-4">
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        var user = await UserManager.GetUserAsync(User);
-                        <span class="text-gray-200">Olá, @(user?.Nome ?? "Usuário")!</span>
-                        <a asp-controller="Profile" asp-action="Index" class="hover:text-gray-200">
-                            <i class="fas fa-user mr-1"></i>Meu Perfil
-                        </a>
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a asp-controller="Admin" asp-action="ListarFuncionarios" class="hover:text-gray-200">Funcionários</a>
-                            <a asp-controller="Admin" asp-action="ListarClientes" class="hover:text-gray-200">Clientes</a>
-                            <a asp-controller="Admin" asp-action="ListarServicos" class="hover:text-gray-200">Serviços</a>
-                            <a asp-controller="Relatorio" asp-action="RelatorioAgendamentos" class="hover:text-gray-200">Relatórios</a>
-                        }
-                        else if (User.IsInRole("Funcionario"))
-                        {
-                            <a asp-controller="Funcionario" asp-action="VisualizarAgendamentos" class="hover:text-gray-200">Meus Agendamentos</a>
-                        }
-                        else if (User.IsInRole("Cliente"))
-                        {
-                            <a asp-controller="Cliente" asp-action="VisualizarAgendamentos" class="hover:text-gray-200">Meus Agendamentos</a>
-                            <a asp-controller="Cliente" asp-action="NovoAgendamento" class="hover:text-gray-200">Novo Agendamento</a>
-                        }
-                        <form asp-controller="Auth" asp-action="Logout" method="post" class="inline">
-                            <button type="submit" class="hover:text-gray-200">Sair</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <a asp-controller="Auth" asp-action="Login" class="hover:text-gray-200">Login</a>
-                        <a asp-controller="Auth" asp-action="Register" class="hover:text-gray-200">Registrar</a>
-                    }
+<body class="bg-white">
+    @if (ViewData["Title"]?.ToString() != "Login" && ViewData["Title"]?.ToString() != "Registro" && ViewData["Title"]?.ToString() != "Home")
+    {
+        <div class="flex min-h-screen">
+            <div class="w-64 bg-emerald-600 text-white p-6 flex flex-col">
+                <div class="flex flex-col items-center mb-8">
+                    <div class="w-24 h-24 bg-gray-200 rounded-full mb-4"></div>
+                    <h2 class="text-base font-semibold text-center">@(usuario?.Nome ?? "Usuário")</h2>
+                    <p class="text-sm text-gray-200">@(usuario?.Email ?? "-")</p>
                 </div>
-            </div>
-        </nav>
-    </header>
 
-    <main class="container mx-auto px-4 py-8">
-        @if (TempData["StatusMessage"] != null)
-        {
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <span class="block sm:inline">@TempData["StatusMessage"]</span>
-            </div>
-        }
-        @if (TempData["ErrorMessage"] != null)
-        {
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                <span class="block sm:inline">@TempData["ErrorMessage"]</span>
-            </div>
-        }
-        @RenderBody()
-    </main>
+                <nav class="flex flex-col space-y-2 flex-grow">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a href="@Url.Action("ListarFuncionarios", "Admin")" class="flex items-center space-x-2 px-3 py-2 rounded-md transition-all @(IsMenuActive("Admin", "ListarFuncionarios", "CadastrarFuncionario", "EditarFuncionario") ? "bg-white text-emerald-600 font-semibold" : "hover:text-gray-200")">
+                            <i class="fas fa-users"></i>
+                            <span>Funcionários</span>
+                        </a>
+                        <a href="@Url.Action("ListarClientes", "Admin")" class="flex items-center space-x-2 px-3 py-2 rounded-md transition-all @(IsMenuActive("Admin", "ListarClientes", "CadastrarCliente", "EditarCliente") ? "bg-white text-emerald-600 font-semibold" : "hover:text-gray-200")">
+                            <i class="fas fa-user-friends"></i>
+                            <span>Clientes</span>
+                        </a>
+                        <a href="@Url.Action("ListarServicos", "Admin")" class="flex items-center space-x-2 px-3 py-2 rounded-md transition-all @(IsMenuActive("Admin", "ListarServicos", "CadastrarServico", "EditarServico") ? "bg-white text-emerald-600 font-semibold" : "hover:text-gray-200")">
+                            <i class="fas fa-concierge-bell"></i>
+                            <span>Serviços</span>
+                        </a>
+                        <a href="@Url.Action("ListarCargos", "Admin")" class="flex items-center space-x-2 px-3 py-2 rounded-md transition-all @(IsMenuActive("Admin", "ListarCargos", "CadastrarCargo", "EditarCargo") ? "bg-white text-emerald-600 font-semibold" : "hover:text-gray-200")">
+                            <i class="fas fa-id-badge"></i>
+                            <span>Cargos</span>
+                        </a>
+                        <a href="@Url.Action("RelatorioAgendamentos", "Relatorio")" class="flex items-center space-x-2 px-3 py-2 rounded-md transition-all @(IsMenuActive("Relatorio", "RelatorioAgendamentos") ? "bg-white text-emerald-600 font-semibold" : "hover:text-gray-200")">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Relatórios</span>
+                        </a>
+                    }
+                    else if (User.IsInRole("Funcionario"))
+                    {
+                        <a href="@Url.Action("VisualizarAgendamentos", "Funcionario")" class="flex items-center space-x-2 px-3 py-2 rounded-md transition-all @(IsMenuActive("Funcionario", "VisualizarAgendamentos") ? "bg-white text-emerald-600 font-semibold" : "hover:text-gray-200")">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Meus Agendamentos</span>
+                        </a>
+                    }
+                    else if (User.IsInRole("Cliente"))
+                    {
+                        <a href="@Url.Action("NovoAgendamento", "Cliente")" class="flex items-center space-x-2 px-3 py-2 rounded-md transition-all @(IsMenuActive("Cliente", "NovoAgendamento") ? "bg-white text-emerald-600 font-semibold" : "hover:text-gray-200")">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>Agendar serviço</span>
+                        </a>
+                        <a href="@Url.Action("VisualizarAgendamentos", "Cliente")" class="flex items-center space-x-2 px-3 py-2 rounded-md transition-all @(IsMenuActive("Cliente", "VisualizarAgendamentos") ? "bg-white text-emerald-600 font-semibold" : "hover:text-gray-200")">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Meus Agendamentos</span>
+                        </a>
+                    }
 
-    <footer class="bg-gray-800 text-white py-8 mt-8">
-        <div class="container mx-auto px-4">
-            <div class="text-center">
-                <p>&copy; @DateTime.Now.Year - Sistema de Agendamentos</p>
+                    <a href="@Url.Action("Index", "Profile")" class="flex items-center space-x-2 px-3 py-2 rounded-md transition-all @(IsControllerActive("Profile") ? "bg-white text-emerald-600 font-semibold" : "hover:text-gray-200")">
+                        <i class="fas fa-user"></i>
+                        <span>Meu perfil</span>
+                    </a>
+                </nav>
+
+                <form asp-controller="Auth" asp-action="Logout" method="post" class="mt-auto">
+                    <button type="submit" class="flex items-center text-white hover:text-gray-200">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        <span>Sair</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="flex-1 p-8">
+                @if (TempData["StatusMessage"] != null)
+                {
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <span class="block sm:inline">@TempData["StatusMessage"]</span>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                        <span class="block sm:inline">@TempData["ErrorMessage"]</span>
+                    </div>
+                }
+                @RenderBody()
             </div>
         </div>
-    </footer>
+    }
+    else
+    {
+        @RenderBody()
+    }
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

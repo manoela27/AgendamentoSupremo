@@ -1,8 +1,10 @@
 ﻿using AgendamentoApp.Entidade;
+using AgendamentoApp.Infraestrutura;
 using AgendamentoApp.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AgendamentoApp.Controllers;
 
@@ -10,24 +12,35 @@ namespace AgendamentoApp.Controllers;
 public class ProfileController : Controller
 {
     private readonly UserManager<Usuario> _userManager;
-    private readonly IUserService _userService;
+    private readonly ApplicationDbContext _context;
 
     public ProfileController(
         UserManager<Usuario> userManager,
-        IUserService userService)
+        ApplicationDbContext context)
     {
         _userManager = userManager;
-        _userService = userService;
+        _context = context;
     }
 
     public async Task<IActionResult> Index()
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null)
+        var userId = _userManager.GetUserId(User);
+        Usuario usuario;
+
+        if (User.IsInRole("Funcionario"))
         {
-            return NotFound();
+            usuario = await _context.Funcionarios
+                .Include(f => f.Cargo)
+                .FirstOrDefaultAsync(f => f.Id == userId);
+        }
+        else
+        {
+            usuario = await _userManager.FindByIdAsync(userId);
         }
 
-        return View(user);
+        if (usuario == null)
+            return NotFound();
+
+        return View(usuario);
     }
 }

@@ -3,6 +3,8 @@
     ViewData["Title"] = "Alterar Dados Pessoais";
 }
 
+
+
 <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
     <div class="px-4 py-6 sm:px-0">
         <div class="bg-white shadow rounded-lg p-6">
@@ -13,52 +15,72 @@
                 </p>
             </div>
 
+
+
             <div class="mt-6">
                 <form method="post" class="space-y-6">
                     @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="Id" />
-                    <input type="hidden" asp-for="CargoId" />
 
                     <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                         <div class="sm:col-span-2">
                             <label for="Nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
                             <div class="mt-1">
-                                <input type="text" name="Nome" id="Nome" value="@Model.Nome" required
+                                <input type="text" asp-for="Nome" required
                                        class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
                             </div>
                         </div>
+
+
 
                         <div>
                             <label for="Email" class="block text-sm font-medium text-gray-700">Email</label>
                             <div class="mt-1">
-                                <input type="email" name="Email" id="Email" value="@Model.Email" required
+                                <input type="email" asp-for="Email" required
                                        class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
                             </div>
                         </div>
+
+
+
+                        <div>
+                            <label for="CPF" class="block text-sm font-medium text-gray-700">CPF</label>
+                            <div class="mt-1">
+                                <input type="text" asp-for="CPF" required readonly
+                                       class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md bg-gray-50">
+                            </div>
+                        </div>
+
+
 
                         <div>
                             <label for="Telefone" class="block text-sm font-medium text-gray-700">Telefone</label>
                             <div class="mt-1">
-                                <input type="tel" name="Telefone" id="Telefone" value="@Model.Telefone" required
+                                <input type="tel" asp-for="Telefone" required
                                        class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
                             </div>
                         </div>
+
+
 
                         <div class="sm:col-span-2">
                             <label for="Endereco" class="block text-sm font-medium text-gray-700">Endereço</label>
                             <div class="mt-1">
-                                <input type="text" name="Endereco" id="Endereco" value="@Model.Endereco" required
+                                <input type="text" asp-for="Endereco" required
                                        class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
                             </div>
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label for="Cargo" class="block text-sm font-medium text-gray-700">Cargo</label>
+                            <label class="block text-sm font-medium text-gray-700">Cargo</label>
                             <div class="mt-1">
-                                <input type="text" value="@Model.Cargo?.Nome" disabled
-                                       class="bg-gray-50 shadow-sm block w-full sm:text-sm border-gray-300 rounded-md">
+                                <input type="text" readonly value="@Model.Cargo?.Nome ?? " Não atribuído""
+                                       class="bg-gray-100 shadow-sm block w-full sm:text-sm border-gray-300 rounded-md text-gray-700">
                             </div>
                         </div>
+
+
+
 
                         <div class="sm:col-span-2">
                             <div class="flex items-start">
@@ -73,6 +95,8 @@
                             </div>
                         </div>
 
+
+
                         <div class="sm:col-span-2 hidden" id="senhaFields">
                             <div class="space-y-4">
                                 <div>
@@ -83,6 +107,8 @@
                                     </div>
                                 </div>
 
+
+
                                 <div>
                                     <label for="novaSenha" class="block text-sm font-medium text-gray-700">Nova Senha</label>
                                     <div class="mt-1">
@@ -90,6 +116,8 @@
                                                class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md">
                                     </div>
                                 </div>
+
+
 
                                 <div>
                                     <label for="confirmarSenha" class="block text-sm font-medium text-gray-700">Confirmar Nova Senha</label>
@@ -101,6 +129,8 @@
                             </div>
                         </div>
                     </div>
+
+
 
                     @if (!ViewContext.ModelState.IsValid)
                     {
@@ -118,6 +148,8 @@
                         </div>
                     }
 
+
+
                     <div class="flex justify-end">
                         <button type="submit"
                                 class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -129,6 +161,8 @@
         </div>
     </div>
 </div>
+
+
 
 @section Scripts {
     <script>
@@ -144,6 +178,8 @@
                 $(this).val(value);
             });
 
+
+
             // Toggle campos de senha
             $('#alterarSenha').change(function() {
                 if ($(this).is(':checked')) {
@@ -154,6 +190,8 @@
                     $('#senhaAtual, #novaSenha, #confirmarSenha').prop('required', false);
                 }
             });
+
+
 
             // Validação de senha
             $('form').on('submit', function(e) {
@@ -167,6 +205,8 @@
             });
         });
     </script>
+
+
 
     @if (TempData["StatusMessage"] != null)
     {

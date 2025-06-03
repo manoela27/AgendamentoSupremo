@@ -1,111 +1,160 @@
-﻿@model AgendamentoApp.Entidade.Usuario
-@{
+﻿@{
     ViewData["Title"] = "Registro";
 }
 
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Criar nova conta
-            </h2>
+@functions {
+    string GetInputClass(string fieldName)
+    {
+        return ViewData.ModelState[fieldName]?.Errors.Count > 0
+            ? "border-red-500 bg-red-50 border-b-2 border"
+            : "border-b-2 border-gray-300";
+    }
+
+    string GetInputError(string fieldName)
+    {
+        return ViewData.ModelState[fieldName]?.Errors.FirstOrDefault()?.ErrorMessage;
+    }
+
+    string GetValue(string fieldName)
+    {
+        return Context.Request.HasFormContentType && Context.Request.Form.ContainsKey(fieldName)
+            ? Context.Request.Form[fieldName]
+            : "";
+    }
+}
+
+<div class="min-h-screen flex flex-col items-center justify-center bg-white p-4">
+    <div class="w-full max-w-md">
+        <div class="mb-12">
+            <img src="~/images/logo-supremo.png" alt="Supremo" class="w-48 mx-auto">
         </div>
-        <form class="mt-8 space-y-6" method="POST">
+
+        <form method="POST" class="space-y-6">
             @Html.AntiForgeryToken()
-            <div class="rounded-md shadow-sm -space-y-px">
-                <div class="mb-4">
-                    <label for="nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
-                    <input type="text" name="Nome" id="nome" required
-                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+
+            <div class="space-y-6">
+                <div>
+                    <label for="nome" class="block text-sm font-medium text-gray-900 mb-1">Nome</label>
+                    <input id="nome" name="nome" type="text" required
+                           value="@GetValue("nome")"
+                           class="block w-full px-0 py-2 bg-transparent text-gray-900 @GetInputClass("nome") focus:ring-0 focus:border-green-600"
+                           placeholder="Informe seu nome">
+                    @if (!string.IsNullOrEmpty(GetInputError("nome")))
+                    {
+                        <span class="text-sm text-red-600">@GetInputError("nome")</span>
+                    }
                 </div>
 
-                <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input type="email" name="Email" id="email" required
-                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
-                    <input type="hidden" name="UserName" id="username">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-900 mb-1">Email</label>
+                    <input id="email" name="email" type="email" required
+                           value="@GetValue("email")"
+                           class="block w-full px-0 py-2 bg-transparent text-gray-900 @GetInputClass("email") focus:ring-0 focus:border-green-600"
+                           placeholder="Informe seu email">
+                    @if (!string.IsNullOrEmpty(GetInputError("email")))
+                    {
+                        <span class="text-sm text-red-600">@GetInputError("email")</span>
+                    }
                 </div>
 
-                <div class="mb-4">
-                    <label for="cpf" class="block text-sm font-medium text-gray-700">CPF</label>
-                    <input type="text" name="CPF" id="cpf" required
-                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div>
+                    <label for="cpf" class="block text-sm font-medium text-gray-900 mb-1">CPF</label>
+                    <input id="cpf" name="cpf" type="text" required
+                           value="@GetValue("cpf")"
+                           class="block w-full px-0 py-2 bg-transparent text-gray-900 @GetInputClass("cpf") focus:ring-0 focus:border-green-600"
+                           placeholder="Informe seu CPF">
+                    @if (!string.IsNullOrEmpty(GetInputError("cpf")))
+                    {
+                        <span class="text-sm text-red-600">@GetInputError("cpf")</span>
+                    }
                 </div>
 
-                <div class="mb-4">
-                    <label for="telefone" class="block text-sm font-medium text-gray-700">Telefone</label>
-                    <input type="tel" name="Telefone" id="telefone" required
-                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div>
+                    <label for="telefone" class="block text-sm font-medium text-gray-900 mb-1">Telefone</label>
+                    <input id="telefone" name="telefone" type="tel" required
+                           value="@GetValue("telefone")"
+                           class="block w-full px-0 py-2 bg-transparent text-gray-900 @GetInputClass("telefone") focus:ring-0 focus:border-green-600"
+                           placeholder="Informe seu telefone">
+                    @if (!string.IsNullOrEmpty(GetInputError("telefone")))
+                    {
+                        <span class="text-sm text-red-600">@GetInputError("telefone")</span>
+                    }
                 </div>
 
-                <div class="mb-4">
-                    <label for="endereco" class="block text-sm font-medium text-gray-700">Endereço</label>
-                    <input type="text" name="Endereco" id="endereco" required
-                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                <div>
+                    <label for="endereco" class="block text-sm font-medium text-gray-900 mb-1">Endereço</label>
+                    <input id="endereco" name="endereco" type="text" required
+                           value="@GetValue("endereco")"
+                           class="block w-full px-0 py-2 bg-transparent text-gray-900 @GetInputClass("endereco") focus:ring-0 focus:border-green-600"
+                           placeholder="Informe seu endereço completo">
+                    @if (!string.IsNullOrEmpty(GetInputError("endereco")))
+                    {
+                        <span class="text-sm text-red-600">@GetInputError("endereco")</span>
+                    }
                 </div>
 
-                <div class="mb-4">
-                    <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
-                    <input type="password" name="password" id="password" required
-                           class="mt-1 focus:ring-blue-500 focus:border-blue-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-900 mb-1">Senha</label>
+                    <div class="relative">
+                        <input id="password" name="password" type="password" required
+                               class="block w-full px-0 py-2 bg-transparent text-gray-900 @GetInputClass("password") focus:ring-0 focus:border-green-600 pr-10"
+                               placeholder="Informe sua senha">
+                        <button type="button" onclick="togglePassword('password', 'eyeIcon1')" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                            <i id="eyeIcon1" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    @if (!string.IsNullOrEmpty(GetInputError("password")))
+                    {
+                        <span class="text-sm text-red-600">@GetInputError("password")</span>
+                    }
                 </div>
+
+
+                <div>
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-900 mb-1">Confirmar Senha</label>
+                    <div class="relative">
+                        <input id="confirmPassword" name="confirmPassword" type="password" required
+                               class="block w-full px-0 py-2 bg-transparent text-gray-900 @GetInputClass("confirmPassword") focus:ring-0 focus:border-green-600 pr-10"
+                               placeholder="Confirme sua senha">
+                        <button type="button" onclick="togglePassword('confirmPassword', 'eyeIcon2')" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                            <i id="eyeIcon2" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    @if (!string.IsNullOrEmpty(GetInputError("confirmPassword")))
+                    {
+                        <span class="text-sm text-red-600">@GetInputError("confirmPassword")</span>
+                    }
+                </div>
+
             </div>
 
-            @if (!ViewContext.ModelState.IsValid)
-            {
-                <div class="text-red-500 text-sm mt-2">
-                    @Html.ValidationSummary(false)
-                </div>
-            }
-
-            <div>
-                <button type="submit"
-                        class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
-                        <i class="fas fa-user-plus"></i>
-                    </span>
-                    Registrar
-                </button>
+            <div class="mt-2 text-sm">
+                <span class="text-gray-600">Já tem uma conta?</span>
+                <a href="@Url.Action("Login", "Auth")" class="text-green-600 hover:text-green-700">Faça login</a>
             </div>
+
+            <button type="submit"
+                    class="mt-8 w-full flex items-center justify-center px-4 py-3 bg-black text-white text-base font-medium rounded-full hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black">
+                Criar Conta
+            </button>
         </form>
-        <div class="text-center">
-            <p class="mt-2 text-sm text-gray-600">
-                Já tem uma conta?
-                <a href="@Url.Action("Login", "Auth")" class="font-medium text-blue-600 hover:text-blue-500">
-                    Faça login
-                </a>
-            </p>
-        </div>
     </div>
 </div>
+<script>
+    function togglePassword(inputId, iconId) {
+        const passwordInput = document.getElementById(inputId);
+        const eyeIcon = document.getElementById(iconId);
 
-@section Scripts {
-    <script>
-        $(document).ready(function() {
-            // Sync email to username
-            $('#email').on('input', function() {
-                $('#username').val($(this).val());
-            });
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            eyeIcon.classList.remove("fa-eye");
+            eyeIcon.classList.add("fa-eye-slash");
+        } else {
+            passwordInput.type = "password";
+            eyeIcon.classList.remove("fa-eye-slash");
+            eyeIcon.classList.add("fa-eye");
+        }
+    }
+</script>
 
-            // Máscara para CPF
-            $('#cpf').on('input', function() {
-                let value = $(this).val().replace(/\D/g, '');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-                $(this).val(value);
-            });
-
-            // Máscara para telefone
-            $('#telefone').on('input', function() {
-                let value = $(this).val().replace(/\D/g, '');
-                if (value.length > 10) {
-                    value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-                } else {
-                    value = value.replace(/^(\d{2})(\d{4})(\d{4}).*/, '($1) $2-$3');
-                }
-                $(this).val(value);
-            });
-        });
-    </script>
-}
