@@ -18,12 +18,11 @@ Sistema web para gerenciamento de agendamentos, clientes, funcionários, serviç
   - JavaScript
 
 ## Objetivo da Aplicação
-O objetivo principal da aplicação é facilitar o gerenciamento de agendamentos em uma organização, permitindo que clientes possam marcar serviços, funcionários possam visualizar seus agendamentos, e administradores possam gerenciar usuários, cargos, serviços e gerar relatórios detalhados sobre o desempenho e faturamento.
+O objetivo principal da aplicação é facilitar o gerenciamento de agendamentos em uma organização, permitindo que clientes possam marcar serviços, funcionários possam visualizar seus agendamentos, e administradores possam gerenciar usuários, cargos, serviços e gerar relatórios detalhados sobre o desempenho e faturamento. Sendo assim, o funcionário é cadastrado somente pelo admin, a parte de cadastrar está relacionada a cliente.
 
 ### Funcionalidades Principais
 
 #### Área do Cliente
-- Cadastro e login de usuários
 - Agendamento de serviços
 - Visualização de histórico de agendamentos
 - Gerenciamento de perfil
@@ -31,7 +30,6 @@ O objetivo principal da aplicação é facilitar o gerenciamento de agendamentos
 #### Área do Funcionário
 - Visualização de agendamentos
 - Gerenciamento de perfil
-- Acompanhamento de serviços
 
 #### Área Administrativa
 - Gestão de funcionários
